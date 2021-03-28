@@ -7,7 +7,8 @@ import {
   AppRegistry,
   TouchableHighlight,
   Linking,
-  Button,
+  Switch,
+  AsyncStorage
 } from 'react-native';
 import Constants from 'expo-constants';
 import { createStackNavigator, Header } from '@react-navigation/stack';
@@ -17,13 +18,40 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import Dialog, { DialogContent } from 'react-native-popup-dialog';
+import { Audio } from 'expo-av'
+import timer from 'react-native-timer';
 import {cssrs1, cssrs2, cssrs3, cssrs4, cssrs5, cssrs6, immediateHelp} from './mentalHealth';
 import {sceneSafe, PPE, alive, consent, breath, air, pulse, bleed} from './triage';
 
 const Root = createStackNavigator();
 
-
+const trainingItems = [
+  {
+    name: 'First Aid',
+    providers: 'Red Cross, AHA, ECSI',
+    link: 'https://www.redcross.org/take-a-class/classes/adult-first-aid%2Fcpr%2Faed/LP-00014200.html'
+  },
+  {
+    name: 'CPR/AED',
+    providers: 'Red Cross, AHA, ECSI',
+    link: 'https://www.redcross.org/take-a-class/classes/adult-and-pediatric-cpr%2Faed/LP-00003600.html'
+  },
+  {
+    name: 'Bloodborne Pathogens',
+    providers: 'Red Cross, AHA, ECSI',
+    link: 'https://cpr.heart.org/en/cpr-courses-and-kits/heartsaver/heartsaver-bloodborne-pathogens-training'
+  },
+  {
+    name: 'Stop the Bleed',
+    providers: 'First Care Provider, American College of Surgeons',
+    link: 'https://www.stopthebleed.org/'
+  },
+  {
+    name: 'Mental Health First Aid',
+    providers: 'Mental Health First Aid USA',
+    link: 'https://www.mentalhealthfirstaid.org/'
+  }
+];
 
 const launcherMenuItems = [
   {
@@ -49,29 +77,62 @@ const launcherMenuItems = [
       menuItems: [
         {
           id: 1,
-          text: 'My Training',
-          page: 'My Training',
+          text: 'Find Training',
+          page: 'Find Training',
           color: '#344c6c',
-          params: {},
+          params: {
+            menuItems: trainingItems 
+          },
         },
         {
           id: 2,
-          text: 'Disclaimer & License',
-          page: 'Disclaimer',
-          color: '#344c6c',
-          params: {},
-        },
-        {
-          id: 3,
           text: 'About This App',
           page: 'About This App',
           color: '#344c6c',
-          params: {},
+          params: {
+            call911: false,
+            callPoison: false,
+            callhotline: false,
+            goForward: false,
+            forwardPage: '',
+            forwardParams: {},
+            forwardText: '',
+            bigText: 'Made By Toby McDonald',
+            graphic: '',
+            smallText: 'Support: webmaster@tfinnm.tk',
+  smallText2: 'This app does not constitute or replace formal training and does not make the user a competant first aider. Always refer to your local protocals, laws, and guidelines.'
+},
         },
       ],
     },
   },
 ];
+
+function menuCheckListScreen({ route, navigation }) {
+  const { menuItems } = route.params;
+  return (
+    <View style={styles.container}>
+      <View style={[{ height: 0 }, { marginBottom: wp('2.5%') }]}></View>
+      {menuItems.map((item) => {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+            Linking.openURL(item.link);
+          }}>
+            <View style={[styles.MenuItem, { backgroundColor: '#344c6c' }]}>
+              <Text style={[{ color: 'white' }, { fontWeight: 'bold' }]}>
+                {item.name}
+              </Text>
+              <Text style={[{ color: 'grey' }]}>
+                {item.providers}
+              </Text>
+            </View>
+          </TouchableHighlight>
+        );
+      })}
+    </View>
+  );
+}
 
 function menuScreen({ route, navigation }) {
   const { menuItems } = route.params;
@@ -79,7 +140,7 @@ function menuScreen({ route, navigation }) {
     <View style={styles.container}>
       <View style={styles.logoBlock}>
         {/* this is just a buffer tbh */}
-        <Image style={[{ height: hp('50%') }, { width: hp('50%') }]} />
+        {/*<Image style={[{ height: hp('50%') }, { width: hp('50%') }]} />*/}
       </View>
       <View style={[{ height: 0 }, { marginBottom: wp('2.5%') }]}></View>
       {menuItems.map((item) => {
@@ -98,6 +159,13 @@ function menuScreen({ route, navigation }) {
       })}
     </View>
   );
+}
+
+const sound = Audio.Sound.createAsync(
+       require('./chirp.mp3')
+    );
+async function metronomepulse() {
+  await sound.playAsync();
 }
 
 const launcher = ({ navigation, route }) => (
@@ -141,6 +209,7 @@ function YesNoPrompt({ route, navigation }) {
 function stopScreen({ route, navigation }) {
   const { call911 } = route.params;
   const { callhotline } = route.params;
+  const { callPoison } = route.params;
   const { goForward } = route.params;
   const { forwardPage } = route.params;
   const { forwardParams } = route.params;
@@ -149,6 +218,10 @@ function stopScreen({ route, navigation }) {
   const { graphic } = route.params;
   const { smallText } = route.params;
   const { smallText2 } = route.params;
+  const { metronome } = route.params;
+  if (metronome) {
+    timer.setTimeout("metronometimer", metronomepulse(), 525);
+  }
   return (
     <View style={{flex:1}}>
     <Text style={{fontSize: 20, textAlign:'center'}}>{bigText}</Text>
@@ -168,7 +241,18 @@ function stopScreen({ route, navigation }) {
           </View>
         </TouchableHighlight>
       )}
-
+      {callPoison && (
+        <TouchableHighlight
+            onPress={() => {
+            Linking.openURL('tel:18002221222');
+          }}>
+        <View style={[styles.MenuItem, { backgroundColor: 'red' }]}>
+            <Text style={[{ color: 'white' }, { fontWeight: 'bold' }]}>
+              Call Poison Control
+            </Text>
+          </View>
+        </TouchableHighlight>
+      )}
       {callhotline && (
         <TouchableHighlight
             onPress={() => {
@@ -228,8 +312,33 @@ export default function App() {
         <Root.Screen name="Medical Emergency | Pulse" component={YesNoPrompt} />
         <Root.Screen name="Medical Emergency | Airway Menu" component={menuScreen} />
         <Root.Screen name="Medical Emergency | CPR" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Choking" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Difficulty Breathing" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Alergic Reaction" component={stopScreen} />
         <Root.Screen name="Medical Emergency | Bleeding" component={YesNoPrompt} />
         <Root.Screen name="Medical Emergency | Bleeding Menu" component={menuScreen} />
+        <Root.Screen name="Medical Emergency | Mental Status" component={YesNoPrompt} />
+        <Root.Screen name="Medical Emergency | Altered Mental Status" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Other Conditions" component={menuScreen} />
+        <Root.Screen name="Medical Emergency | Bloody Nose" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Stop The Bleed" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Wound Care" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Scrapes" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Poison" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Physical Injuries" component={menuScreen} />
+        <Root.Screen name="Medical Emergency | Heart Attack" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Shock" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Enviromental Menu" component={menuScreen} />
+        <Root.Screen name="Medical Emergency | FrostBite" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Sunburn" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Bites/Stings" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Heat Stress" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Hypothermia" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Dehydration" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Broken Bones" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Burns" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Pain" component={stopScreen} />
+        
         <Root.Screen
           name="Mental Health Crisis | C-SSRS 1"
           component={YesNoPrompt}
@@ -263,9 +372,8 @@ export default function App() {
           component={stopScreen}
         />
         <Root.Screen name="General Info" component={menuScreen} />
-        <Root.Screen name="My Training" component={launcher} />
-        <Root.Screen name="Disclaimer" component={launcher} />
-        <Root.Screen name="About This App" component={launcher} />
+        <Root.Screen name="Find Training" component={menuCheckListScreen} />
+        <Root.Screen name="About This App" component={stopScreen} />
       </Root.Navigator>
     </NavigationContainer>
   );
