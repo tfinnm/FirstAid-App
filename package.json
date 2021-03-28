@@ -8,9 +8,12 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "expo-av": "~8.7.0",
+    "expo-asset": "~8.2.1",
     "expo-constants": "~9.3.3",
     "react-native-modal": "*",
     "react-native-paper": "3.6.0",
+    "react-native-timer": "*",
     "react-native-screens": "~2.15.2",
     "@react-navigation/stack": "*",
     "@react-navigation/native": "5.0.5",
