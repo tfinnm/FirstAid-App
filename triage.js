@@ -1,23 +1,32 @@
+import {breathingMenu, airwayMenu, CPRInstruct, bleedingMenu, Altered, otherMenu} from './care.js';
+
+const awake = {
+  promptText: 'Is the patient Awake, Alert, and Oriented?',
+  yesPage: 'Medical Emergency | Other Conditions',
+  noPage: 'Medical Emergency | Altered Mental Status',
+  yesParams: {menuItems: otherMenu},
+  noParams: Altered,
+}
 const bleed = {
   promptText: 'Is the patient bleeding?',
   yesPage: 'Medical Emergency | Bleeding Menu',
-  noPage: 'Medical Emergency | CPR',
-  yesParams: {},
-  noParams: {},
+  noPage: 'Medical Emergency | Mental Status',
+  yesParams: {menuItems: bleedingMenu},
+  noParams: awake,
 };
 const pulse = {
   promptText: 'Does the patient have a pulse?',
   yesPage: 'Medical Emergency | Bleeding',
   noPage: 'Medical Emergency | CPR',
   yesParams: bleed,
-  noParams: {},
+  noParams: CPRInstruct,
 };
 const air = {
   promptText:
     'Is the patient choking, having difficulty breathing, or have an obstructed airway?',
   yesPage: 'Medical Emergency | Airway Menu',
   noPage: 'Medical Emergency | Pulse',
-  yesParams: {},
+  yesParams: {menuItems: airwayMenu},
   noParams: pulse,
 };
 const breath = {
@@ -25,14 +34,26 @@ const breath = {
   yesPage: 'Medical Emergency | Airway',
   noPage: 'Medical Emergency | Brething Menu',
   yesParams: air,
-  noParams: {},
+  noParams: {menuItems: breathingMenu},
 };
 const consent = {
-  promptText: 'Do you have the patient\'s explicit consent to treat them?',
+  promptText: 'Do you have the patient\'s explicit consent to be treated?',
   yesPage: 'Medical Emergency | Breathing',
   noPage: 'Medical Emergency | STOP! Obtain Consent',
   yesParams: breath,
-  noParams: {},
+  noParams: {
+    call911: false,
+    callhotline: false,
+    goForward: true,
+    forwardPage: 'Medical Emergency | Obtain Consent',
+    forwardParams: consent,
+    forwardText: 'I have consent.',
+    bigText: 'STOP! Do Not Proceed Without Consent!',
+    graphic: '',
+    smallText:
+    'Rendering aid without the patients consent is illegal in most of the world.',
+    smallText2: 'If you render aid without consent, you may be legally liable. Note: if the patient is unable to consent (such as if they are unconcious or choking) you can assume that they consent until they become able to.'
+  },
 };
 const alive = {
   promptText: 'Is the patient conscious?',
