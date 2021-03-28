@@ -1,0 +1,1 @@
+I used a handful of individual lines of code from the official react-native documentation, the expo documentation, and the react navigation documentation, as well as some individual lines my teacher gave in class last week for when we start our react-native unit.
