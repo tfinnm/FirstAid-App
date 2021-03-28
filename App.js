@@ -18,140 +18,12 @@ import {
 } from 'react-native-responsive-screen';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import Dialog, { DialogContent } from 'react-native-popup-dialog';
+import {cssrs1, cssrs2, cssrs3, cssrs4, cssrs5, cssrs6, immediateHelp} from './mentalHealth';
+import {sceneSafe, PPE, alive, consent, breath, air, pulse, bleed} from './triage';
 
 const Root = createStackNavigator();
 
-const immediateHelp = {
-  call911: true,
-  callhotline: true,
-  goForward: false,
-  forwardPage: 'launcher',
-  forwardParams: {},
-  forwardText: 'Home',
-  bigText: 'Seek Immediate Help',
-  graphic: '',
-  smallText:
-    'Seek Immediate Professional Help For The Patient. STAY WITH THEM UNTIL HELP ARRIVES!',
-  smallText2: 'This patient has been classified as \"High Risk\" by the Columbia Protocal, an evidence based suicide traige tool. It is recommended that they get help immediately.'
-};
-const cssrs6 = {
-  promptText:
-    'Ask the patient: "In the past three months, have you done anything, started to do anything, or prepared to do anything to end your life? (For example: collecting pills, self harm, or writing a suicide note)"',
-  yesPage: 'Mental Health Crisis | Seek Immediate Help',
-  noPage: 'Mental Health Crisis | Seek Professional Help',
-  yesParams: immediateHelp,
-  noParams: {
-    call911: false,
-    callhotline: false,
-    goForward: true,
-    forwardPage: 'launcher',
-    forwardParams: {},
-    forwardText: 'Home',
-    bigText: 'Seek Proffesional Help',
-    graphic: '',
-    smallText:
-    'It is recommended that the patient seeks professional help.',
-    smallText2: 'Although the assessment has determined that the patient is not considered \"High Risk\", a yes to any of these questions indicates that the patient should seek professional help. Even if all of the questions were answered no, it may be worth talking to a professional.'
-  },
-};
-const cssrs5 = {
-  promptText:
-    'Ask the patient: "In the last month, have you worked out or started to work out the details of how to kill yourself?"',
-  yesPage: 'Mental Health Crisis | Seek Immediate Help',
-  noPage: 'Mental Health Crisis | C-SSRS 6',
-  yesParams: immediateHelp,
-  noParams: cssrs6,
-};
-const cssrs4 = {
-  promptText:
-    'Ask the patient: "In the last month, have you had any intention of acting on these thoughts of killing yourself, as opposed to you have the thoughts but you definately would not act on them?"',
-  yesPage: 'Mental Health Crisis | Seek Immediate Help',
-  noPage: 'Mental Health Crisis | C-SSRS 5',
-  yesParams: immediateHelp,
-  noParams: cssrs5,
-};
-const cssrs3 = {
-  promptText:
-    'Ask the patient: "In the last month, have you though how you might do this?"',
-  yesPage: 'Mental Health Crisis | C-SSRS 4',
-  noPage: 'Mental Health Crisis | C-SSRS 4',
-  yesParams: cssrs4,
-  noParams: cssrs4,
-};
-const cssrs2 = {
-  promptText:
-    'Ask the patient: "In the last month, have you actually had any thoughts about killing yourself?"',
-  yesPage: 'Mental Health Crisis | C-SSRS 3',
-  noPage: 'Mental Health Crisis | C-SSRS 6',
-  yesParams: cssrs3,
-  noParams: cssrs6,
-};
-const cssrs1 = {
-  promptText:
-    'Ask the patient: "In the last month, have you wished you were dead or wished you could go to sleep and not wake up?"',
-  yesPage: 'Mental Health Crisis | C-SSRS 2',
-  noPage: 'Mental Health Crisis | C-SSRS 2',
-  yesParams: cssrs2,
-  noParams: cssrs2,
-};
-const bleed = {
-  promptText: 'Is the patient bleeding?',
-  yesPage: 'Medical Emergency | Bleeding Menu',
-  noPage: 'Medical Emergency | CPR',
-  yesParams: {},
-  noParams: {},
-};
-const pulse = {
-  promptText: 'Does the patient have a pulse?',
-  yesPage: 'Medical Emergency | Bleeding',
-  noPage: 'Medical Emergency | CPR',
-  yesParams: bleed,
-  noParams: {},
-};
-const air = {
-  promptText:
-    'Is the patient choking, having difficulty breathing, or have an obstructed airway?',
-  yesPage: 'Medical Emergency | Airway Menu',
-  noPage: 'Medical Emergency | Pulse',
-  yesParams: {},
-  noParams: pulse,
-};
-const breath = {
-  promptText: 'Is the patient breathing?',
-  yesPage: 'Medical Emergency | Airway',
-  noPage: 'Medical Emergency | Brething Menu',
-  yesParams: air,
-  noParams: {},
-};
-const consent = {
-  promptText: 'Do you have the patients explicit consent to treat them?',
-  yesPage: 'Medical Emergency | Breathing',
-  noPage: 'Medical Emergency | STOP! Obtain Consent',
-  yesParams: breath,
-  noParams: {},
-};
-const alive = {
-  promptText: 'Is the patient conscious?',
-  yesPage: 'Medical Emergency | Obtain Consent',
-  noPage: 'Medical Emergency | Breathing',
-  yesParams: consent,
-  noParams: breath,
-};
-const PPE = {
-  promptText:
-    'Do you have proper PPE on, if availible? (Such as latex-free gloves)',
-  yesPage: 'Medical Emergency | Consciousness',
-  noPage: 'Medical Emergency| STOP! Use PPE',
-  yesParams: alive,
-  noParams: {},
-};
-const sceneSafe = {
-  promptText: 'Are you in a safe location? Are you clear of any danger?',
-  yesPage: 'Medical Emergency | PPE',
-  noPage: 'Medical Emergency| STOP! Move To Safety',
-  yesParams: PPE,
-  noParams: {},
-};
+
 
 const launcherMenuItems = [
   {
@@ -230,9 +102,10 @@ function menuScreen({ route, navigation }) {
 
 const launcher = ({ navigation, route }) => (
   <View>
-    {navigation.replace('First Aid App', { menuItems: launcherMenuItems })}
+    {navigation.replace('Rescue Ready: First Aid Reference', { menuItems: launcherMenuItems })}
   </View>
 );
+
 function YesNoPrompt({ route, navigation }) {
   const { promptText } = route.params;
   const { yesPage } = route.params;
@@ -329,15 +202,15 @@ export default function App() {
     <NavigationContainer>
       <Root.Navigator>
         <Root.Screen name="launcher" component={launcher} />
-        <Root.Screen name="First Aid App" component={menuScreen} />
+        <Root.Screen name="Rescue Ready: First Aid Reference" component={menuScreen} />
         <Root.Screen
           name="Medical Emergency | Scene Safety"
           component={YesNoPrompt}
         />
         <Root.Screen name="Medical Emergency | PPE" component={YesNoPrompt} />
         <Root.Screen
-          name="Medical Emergency| STOP! Move To Safety"
-          component={YesNoPrompt}
+          name="Medical Emergency | STOP! Move To Safety"
+          component={stopScreen}
         />
         <Root.Screen
           name="Medical Emergency | Consciousness"
@@ -345,8 +218,18 @@ export default function App() {
         />
         <Root.Screen
           name="Medical Emergency| STOP! Use PPE"
-          component={YesNoPrompt}
+          component={stopScreen}
         />
+        <Root.Screen name="Medical Emergency | Obtain Consent" component={YesNoPrompt} />
+        <Root.Screen name="Medical Emergency | Breathing" component={YesNoPrompt} />
+        <Root.Screen name="Medical Emergency | STOP! Obtain Consent" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Brething Menu" component={menuScreen} />
+        <Root.Screen name="Medical Emergency | Airway" component={YesNoPrompt} />
+        <Root.Screen name="Medical Emergency | Pulse" component={YesNoPrompt} />
+        <Root.Screen name="Medical Emergency | Airway Menu" component={menuScreen} />
+        <Root.Screen name="Medical Emergency | CPR" component={stopScreen} />
+        <Root.Screen name="Medical Emergency | Bleeding" component={YesNoPrompt} />
+        <Root.Screen name="Medical Emergency | Bleeding Menu" component={menuScreen} />
         <Root.Screen
           name="Mental Health Crisis | C-SSRS 1"
           component={YesNoPrompt}
